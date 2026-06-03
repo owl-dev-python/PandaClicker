@@ -1,0 +1,33 @@
+name: Build macOS App
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    name: Build PandaClicker.app
+    runs-on: macos-15
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Build app
+        run: |
+          chmod +x scripts/build-mac.sh
+          ./scripts/build-mac.sh
+
+      - name: Package app
+        run: |
+          cd build
+          ditto -c -k --keepParent PandaClicker.app PandaClicker-macOS.zip
+
+      - name: Upload ready-to-open app
+        uses: actions/upload-artifact@v4
+        with:
+          name: PandaClicker-macOS
+          path: build/PandaClicker-macOS.zip
